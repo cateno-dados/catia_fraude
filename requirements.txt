@@ -1,0 +1,6 @@
+psycopg2-binary
+sshtunnel
+paramiko
+polars
+pyspark
+python-dotenv
