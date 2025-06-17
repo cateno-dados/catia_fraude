@@ -1,0 +1,58 @@
+
+# Ignore virtual environments
+venv/
+.env/
+.venv/
+
+# Ignore OS-generated files
+.DS_Store
+Thumbs.db
+
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignore Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ignore compiled C extensions
+*.so
+
+# Ignore Jupyter runtime files
+*.json
+*.log
+
+# Ignore large binaries
+*.zip
+*.tar.gz
+*.rar
+*.7z
+*.jar
+*.exe
+*.dll
+*.msi
+*.deb
+*.rpm
+
+# Ignore data and model artifacts
+*.h5
+*.hdf5
+*.pkl
+*.joblib
+*.csv
+*.parquet
+*.sav
+*.xls
+*.xlsx
+
+# Ignore Java SDKs or external SDKs
+java-temurin-11/
+
+# Ignore environment settings
+*.env
+.envrc
+
+# Ignore git-lfs placeholders if not used
+.gitattributes
+java-temurin-11/
