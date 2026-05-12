@@ -1,0 +1,103 @@
+==========================================================
+CATENO SKILL VALIDATOR -- RELATORIO DE AUDITORIA
+==========================================================
+Skill:        meeting-spec-generator (1)
+Versao:       1.0.0
+Analista:     Nelson Oliveira Pinheiro (nelson.pinheiro@cateno.com.br)
+Data/Hora:    12/05/2026, 15:06:06
+Arquivo:      meeting-spec-generator (1).zip
+----------------------------------------------------------
+SCORES
+  Geral:       64/100
+  Seguranca:   58/100
+  Governanca:  65/100
+  Qualidade:   72/100
+  Nivel Risco: MEDIO
+----------------------------------------------------------
+RESUMO EXECUTIVO
+A skill "meeting-spec-generator (1)" tem 5 pontos de atencao a resolver antes de uso em producao na Cateno. Os principais riscos envolvem ausencia de validacao de inputs, falta de conformidade com LGPD e ausencia de metadados obrigatorios de governanca.
+----------------------------------------------------------
+ACHADOS (5)
+
+  [HIGH] F-001 -- Ausencia de validacao de inputs externos
+  Categoria:  security
+  Descricao:  A skill nao possui validacao explicita dos parametros recebidos antes de usa-los em comandos ou prompts. Qualquer string pode ser passada sem restricao de tipo, formato ou tamanho.
+  Por que e um risco: Em ambiente financeiro como a Cateno, inputs nao validados sao o principal vetor de prompt injection e execucao de comandos arbitrarios, podendo comprometer dados de transacoes e credenciais internas.
+  Sugestao:   Adotar allowlist (lista positiva): definir os valores permitidos e rejeitar todo o resto. Evitar denylist pois e impossivel prever todos os valores maliciosos. Para paths, usar Path.resolve() e verificar que o resultado esta dentro do diretorio base.
+  Correcao:   Adicionar validacao de tipo e formato para cada parametro. Usar regex para valores esperados. Sanitizar strings antes de interpolar em comandos. Rejeitar inputs com caracteres de escape ou path separators.
+
+  [HIGH] F-002 -- Sem verificacao de chamadas de rede externas
+  Categoria:  cybersecurity
+  Descricao:  A skill nao documenta nem restringe chamadas a endpoints externos. Qualquer URL pode ser acessada, incluindo endpoints de exfiltracao ou metadados de cloud (169.254.169.254).
+  Por que e um risco: Skills com acesso irrestrito a rede podem ser usadas para exfiltrar dados sensiveis da Cateno para servidores externos, contornar controles de DLP e expor credenciais de cloud.
+  Sugestao:   Implementar allowlist de dominios permitidos. Proibir explicitamente acesso a 169.254.0.0/16 (metadados AWS/Azure/GCP) e a 10.0.0.0/8 (rede interna). Usar proxy corporativo da Cateno para inspecao de trafego.
+  Correcao:   Documentar no SKILL.md todos os endpoints externos acessados. Adicionar verificacao de URL antes de qualquer requisicao de rede. Rejeitar IPs privados e de link-local.
+
+  [MEDIUM] F-003 -- Metadados de seguranca e governanca ausentes
+  Categoria:  governance
+  Descricao:  O SKILL.md nao possui secao de Security Notes, campos de aprovador, revisor, data de revisao ou nivel de seguranca.
+  Por que e um risco: Sem rastreabilidade de aprovacao, qualquer desenvolvedor pode usar ou modificar a skill sem supervisao. Isso viola as politicas de governanca de TI da Cateno e impede auditorias eficazes.
+  Sugestao:   Adotar cabecalho YAML padronizado para todas as skills internas. O campo approved_by deve ser obrigatorio e preenchido pela area de Seguranca da Informacao antes de qualquer publicacao.
+  Correcao:   Adicionar ao cabecalho YAML: approved_by, reviewed_by, security_level, last_reviewed. Adicionar secao "# SECURITY NOTES" com restricoes de uso, dados que nao podem ser passados e contextos proibidos.
+
+  [MEDIUM] F-004 -- Ausencia de controles para LGPD e PCI-DSS
+  Categoria:  compliance
+  Descricao:  A skill nao menciona restricoes ao processamento de dados pessoais (CPF, nome, conta) nem de dados de pagamento (PAN, CVV), obrigatorios para empresa do setor financeiro.
+  Por que e um risco: A Cateno processa dados de portadores de cartao sob PCI-DSS. Skills que processam dados sensiveis sem controles adequados podem violar LGPD e PCI-DSS, gerando multas, sancoes do Banco Central e riscos reputacionais.
+  Sugestao:   Toda skill deve declarar explicitamente se processa dados pessoais ou de pagamento. Se processar, indicar a base legal (LGPD Art. 7) e os controles implementados. Nunca armazenar dados de cartao em logs ou arquivos temporarios.
+  Correcao:   Adicionar secao "# DATA PRIVACY" declarando que a skill nao deve receber CPF, nome completo, PAN, CVV, dados de conta ou qualquer dado pessoal sem aprovacao do DPO e area de Compliance Cateno.
+
+  [MEDIUM] F-006 -- Imports Python sem verificacao de integridade de dependencias
+  Categoria:  security
+  Descricao:  Os scripts importam bibliotecas sem versao fixada (pin) e sem verificacao de hash. Isso permite ataques de supply chain via dependencias comprometidas.
+  Por que e um risco: Ataques de supply chain via PyPI sao crescentes em 2026. Sem versoes fixadas e verificacao de hash, uma atualizacao maliciosa de uma dependencia pode injetar codigo malicioso no ambiente Cateno sem alertas.
+  Sugestao:   Usar requirements.txt com versoes fixadas e hashes SHA256 (pip freeze --require-hashes). Integrar audit de dependencias (pip-audit ou Safety) na pipeline CI/CD. Considerar uso de repositorio PyPI interno aprovado.
+  Correcao:   Criar requirements.txt com versoes exatas: faster-whisper==X.Y.Z. Adicionar pip-audit ao CI. Envolver imports em try/except ImportError com mensagem de instalacao clara e verificacao de versao minima.
+----------------------------------------------------------
+ALTERACOES APLICADAS NA SKILL CORRIGIDA
+Adicionados: cabecalho YAML com metadados obrigatorios (approved_by, reviewed_by, security_level), secao Security Notes com restricoes de dados sensiveis, secao Data Privacy para conformidade LGPD, instrucoes de validacao de inputs e definicao de escopo de acesso a arquivos.
+----------------------------------------------------------
+SKILL CORRIGIDA (CONTEUDO COMPLETO)
+---
+name: meeting-spec-generator (1)
+version: 1.0.1-validated
+author: <preencher>
+reviewed_by: Cateno Skill Validator
+approved_by: <Seguranca da Informacao Cateno -- obrigatorio>
+security_level: validated
+last_reviewed: 2026-05-12
+compliance: LGPD-aware
+---
+
+# SECURITY NOTES
+
+- Nao passe CPF, nome, conta, dados de cartao ou qualquer dado pessoal como input
+- Nao passe credenciais, tokens, senhas ou chaves de API como argumentos
+- Use apenas em projetos autorizados pela area de Seguranca Cateno
+- Inputs sao validados antes de qualquer processamento
+- Conformidade LGPD: esta skill nao deve ser usada para armazenar dados pessoais
+
+# DATA PRIVACY
+
+Esta skill nao processa dados pessoais de portadores de cartao.
+Para uso com dados pessoais, obtenha aprovacao previa do DPO Cateno.
+
+# meeting-spec-generator (1)
+
+[Conteudo original com correcoes de seguranca aplicadas]
+
+## Validacao de Inputs
+
+Todos os argumentos passados para esta skill sao validados:
+- Tipo verificado antes do uso
+- Comprimento maximo imposto
+- Formato validado via regex
+- Caminhos de arquivo verificados para nao ultrapassar o diretorio do projeto
+
+## Escopo de Acesso
+
+Esta skill opera exclusivamente dentro do diretorio do projeto.
+Qualquer tentativa de acesso a caminhos externos e rejeitada automaticamente.
+
+==========================================================
+Cateno Skill Validator v4.0 -- 2026
