@@ -1,0 +1,82 @@
+# Template YAML para generate_spec.py.
+# Comente ou remova blocos não usados. Caminhos de imagens são relativos a este YAML.
+
+metadata:
+  title: "Especificação Funcional"
+  subtitle: "Nome do Escopo"
+  subtitle2: "Subtítulo opcional"
+  subtitle3: "Linha extra opcional em itálico"
+
+# Bloco de metadados que aparece após o título da capa.
+metadata_rows:
+  - ["Projeto", "MEU_PROJETO  |  Aplicação X"]
+  - ["Versão",  "1.0   |   Estado: Especificação inicial"]
+  - ["Data",    "06/05/2026"]
+  - ["Autor",   "Nome do autor"]
+  - ["Fontes",  "Reunião de DD/MM/YYYY. Rascunho. Documento oficial."]
+
+# Tabela de controle de versão (ID, Data, Autor, Alterações).
+versions:
+  - ["1.0", "06/05/2026", "Nome do autor", "Primeira versão. Resumo do conteúdo."]
+
+# Sumário simples (lista textual).
+summary:
+  - "1. Visão geral"
+  - "2. Contexto"
+  - "3. Regras"
+  - "4. Requisitos"
+  - "5. Pendências"
+
+# Seções. Cada item é um bloco com uma ou mais propriedades.
+sections:
+  - heading: "1. Visão geral"
+
+  - heading: "1.1 Problema"
+    level: 2
+  - paragraphs:
+      - "Descrição do problema em parágrafo único."
+      - "Segundo parágrafo se necessário."
+
+  - heading: "1.2 Objetivo"
+    level: 2
+  - paragraph: "Texto do objetivo. Frases curtas."
+
+  - callout:
+      title: "ESCOPO"
+      body: "Este documento cobre apenas o tema X. O tema Y fica para spec separada."
+
+  - heading: "2. Contexto"
+  - bullets:
+      - "Primeiro ponto de contexto."
+      - "Segundo ponto."
+      - "Terceiro ponto."
+
+  - heading: "3. Regras de negócio"
+  - table:
+      headers: ["ID", "Regra"]
+      widths_cm: [1.8, 14.2]
+      rows:
+        - ["R01", "Texto da primeira regra."]
+        - ["R02", "Texto da segunda regra."]
+
+  - heading: "4. Requisitos funcionais"
+  - table:
+      headers: ["ID", "Requisito"]
+      widths_cm: [1.6, 14.4]
+      rows:
+        - ["RF01", "O sistema deve fazer A."]
+        - ["RF02", "O sistema deve fazer B."]
+
+  - heading: "5. Anexos"
+  - image:
+      path: "../evidencias/figura.png"
+      caption: "Figura 1. Legenda explicativa."
+      width_cm: 12
+
+  - page_break: true
+  - heading: "6. Pendências"
+  - table:
+      headers: ["ID", "Pendência"]
+      widths_cm: [1.8, 14.2]
+      rows:
+        - ["P01", "Confirmar X com o time Y."]
